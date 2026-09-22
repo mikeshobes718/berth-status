@@ -1,0 +1,60 @@
+name: uptime
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+    inputs:
+      test_alert:
+        description: Send one test email and skip the checks
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: uptime
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Load state branch
+        run: |
+          git fetch -q --depth=1 origin state
+          git worktree add -q state FETCH_HEAD
+
+      - name: Run checks
+        id: check
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          TEST_ALERT: ${{ inputs.test_alert }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: python3 check.py state
+
+      - name: Save state
+        if: always() && inputs.test_alert != true
+        run: |
+          cd state
+          git config user.name "berth-status"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "state: no change"
+          else
+            git commit -q -m "state $(date -u +%Y-%m-%dT%H:%MZ)"
+            git push -q origin HEAD:state
+            echo "state: saved"
+          fi
+
+      - name: Keep schedule enabled
+        if: always() && steps.check.outputs.heartbeat == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X PUT "repos/${{ github.repository }}/actions/workflows/uptime.yml/enable" && echo "keep-alive: enabled"
