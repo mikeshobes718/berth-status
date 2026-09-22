@@ -57,4 +57,6 @@ jobs:
         if: always() && steps.check.outputs.heartbeat == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh api -X PUT "repos/${{ github.repository }}/actions/workflows/uptime.yml/enable" && echo "keep-alive: enabled"
+        run: |
+          gh api -X PUT "repos/${{ github.repository }}/actions/workflows/uptime.yml/enable"
+          echo "keep-alive: enabled"
