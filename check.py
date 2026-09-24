@@ -21,7 +21,7 @@ TLS_MIN_DAYS = 14
 TRIES = 3
 WAIT = 20
 TO = "mikeshobes718@gmail.com"
-FROM = "Berth Monitor <alerts@reviewsandmarketing.com>"
+FROM = "Berth Monitor <alerts@atberth.com>"
 UA = "berth-status"
 
 

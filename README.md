@@ -12,7 +12,7 @@ Each check is tried 3 times, 20 seconds apart, before it counts as down.
 
 ## Alerts
 
-Email goes to mikeshobes718@gmail.com through Resend from `alerts@reviewsandmarketing.com`, using the `RESEND_API_KEY` Actions secret. It emails only when the set of failing checks changes: one `[Berth] DOWN` email, then one `[Berth] recovered` email. The last state lives in `status.json` on the `state` branch.
+Email goes to mikeshobes718@gmail.com through Resend from `alerts@atberth.com`, using the `RESEND_API_KEY` Actions secret. It emails only when the set of failing checks changes: one `[Berth] DOWN` email, then one `[Berth] recovered` email. The last state lives in `status.json` on the `state` branch.
 
 Logs are public. The script prints only check names, status codes, and pass or fail. It never prints bodies, addresses, or secrets.
 
